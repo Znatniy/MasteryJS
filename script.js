@@ -1,6 +1,6 @@
 let cols, rows, cellSize;
 let audio = new Audio();
-audio.src = 'Limp Bizkit - Take A Look Around.mp3';
+audio.src = 'The Neighbourhood - Sweater Weather.mp3';
 audio.controls = true;
 
 window.onload = initMp3Player;
@@ -12,7 +12,10 @@ const audioCtx = new window.AudioContext();
 const source = audioCtx.createMediaElementSource(audio);
 const analyser = audioCtx.createAnalyser();
 analyser.fftSize = 2048;
+const bufferLength = analyser.frequencyBinCount;
 const dataArray = new Uint8Array(analyser.frequencyBinCount);
+let bufferRatio = bufferLength / (cols * rows);
+
 
 analyser.connect(audioCtx.destination);
 source.connect(analyser);
@@ -37,7 +40,7 @@ function uploadFile(files) {
     };
 }
 
-//отрисовка сетки по параметрам
+//отрисовка сетки по параметрам инпута
 function draw() {
     requestAnimationFrame(draw);
     analyser.getByteFrequencyData(dataArray);
@@ -53,10 +56,9 @@ function draw() {
         for (let i = 0; i < cols * cellSize; i = i + cellSize) {
             const indexFreq = Math.floor(i * j);
             const freq = dataArray[indexFreq];
-
             ctx.rect(i, j * cellSize, cellSize, cellSize);
             ctx.strokeStyle = "black";
-            ctx.lineWidth = "1";
+            ctx.lineWidth = "2";
             ctx.stroke();
             ctx.fillStyle = getColor(freq);
             ctx.fillRect(i, j * cellSize, cellSize, cellSize);
@@ -65,7 +67,7 @@ function draw() {
 }
 
 function getColor(freq) {
-    const normalFreq = (freq * 50) / 100;
+    const normalFreq = (freq * 300) / 200;
     return `hsl(${Math.floor(normalFreq)}, 100%, 50%)`;
 }
 
