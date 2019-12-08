@@ -1,10 +1,36 @@
+let audio = new Audio();
+audio.src = 'Limp Bizkit - Take A Look Around.mp3';
+audio.controls = true;
+
 window.onload = initMp3Player;
+
+let cols = document.getElementById('nCols').value;
+let rows = document.getElementById('nRows').value;
+let cellSize = Math.floor(1350 / cols);
+
+let canvas = document.getElementById('canvas');
+let ctx = canvas.getContext('2d');
+
+const audioCtx = new window.AudioContext();
+const source = audioCtx.createMediaElementSource(audio);
+const analyser = audioCtx.createAnalyser();
+analyser.fftSize = 512;
+const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+analyser.connect(audioCtx.destination);
+source.connect(analyser);
+
+
+
+//init
+function initMp3Player() {
+    document.getElementById('audio_box').appendChild(audio);
+    draw();
+}
 
 //получение файла с локальной машины
 function uploadFile(files) {
     let file = files[0];
-    console.log(file.name); //имя файла
-    console.log(file.size); //размер файла
     let info = document.getElementById('musicInfo');
     info.innerHTML = file.name;
     let fReader = new FileReader();
@@ -15,21 +41,13 @@ function uploadFile(files) {
         audio.load();
     };
 }
-
-function initMp3Player() {
-    document.getElementById('audio_box').appendChild(audio);
-}
-
-var audio = new Audio();
-audio.src = 'Limp Bizkit - Take A Look Around.mp3';
-audio.controls = true;
-
-let canvas = document.getElementById('canvas');
-let ctx = canvas.getContext('2d');
-
+ 
 //отрисовка сетки по параметрам
 function draw() {
-    //ctx.clearRect(0, 0, canvas.width, canvas.height); не работает, какого хуя? 
+    requestAnimationFrame(draw);
+    analyser.getByteFrequencyData(dataArray);
+    ctx.clearRect(0, 0, canvas.width, canvas.height); 
+    ctx.beginPath();
     let cols = document.getElementById('nCols').value;
     let rows = document.getElementById('nRows').value;
     let cellSize = Math.floor(1350 / cols);
@@ -41,5 +59,10 @@ function draw() {
             ctx.stroke();
         }
     }
+}
+
+function getColor(freq) {
+    const normalFreq = (freq * 50) / 100;
+    return `hsl(${Math.floor(normalFreq)}, 100%, 20%)`;
 }
 

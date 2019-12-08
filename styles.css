@@ -11,7 +11,7 @@ body {
     font-size: 18px;
 }
 #canvas {
-    width: 1400px;
+    max-width: 1400px;
     max-height: 6000px;
     margin: 30px;
 }
